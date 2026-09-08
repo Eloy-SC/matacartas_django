@@ -680,6 +680,7 @@ def finalizar_partida(actor, partida_id):
 
     # Actualizar puntuación de los usuarios si la partida tiene cartas especiales y tickets
     puntuacion_ganada = _calcular_puntuacion_ganada_por_jugadores(partida, posiciones)
+    partida.puntuacion_asignada_final = puntuacion_ganada
     if partida.cartas_especiales and partida.tickets:
         for pos, jugadores_pos in posiciones.items():
             for jugador in jugadores_pos:
@@ -687,8 +688,9 @@ def finalizar_partida(actor, partida_id):
                 partida_usuario = get_partida_usuario_by_partida_and_color(partida_id, color)
                 usuario = partida_usuario.usuario
                 n = partida.num_jugadores
+                puntuacion_del_jugador = puntuacion_ganada.get(color, 0)
                 if n > pos:
-                    usuario.puntuacion += (n/pos) * 100
+                    usuario.puntuacion += puntuacion_del_jugador
                     usuario.save()
 
     # Guardar la fecha de finalización de la partida y limipiar turno actual para evitar acciones de juego

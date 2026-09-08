@@ -141,3 +141,14 @@ def recopilar_efecto_extra_fin_mano(mano_id, color_beneficiado, efecto):
     resumen_mano = get_resumen_mano_by_mano_id(mano_id)
     resumen_mano.efectos_extra_fin_mano.append((color_beneficiado, efecto))
     resumen_mano.save(update_fields=["efectos_extra_fin_mano"])
+
+def recopilar_puntos_extra(mano_id, carta, puntos):
+
+    resumen_mano = get_resumen_mano_by_mano_id(mano_id)
+    if carta == "REBELDE":
+        resumen_mano.puntos_rebelde = puntos
+    elif carta == "MERCADER":
+        resumen_mano.puntos_mercader = puntos
+    elif carta == "SEGADOR":
+        resumen_mano.puntos_segador = puntos
+    resumen_mano.save(update_fields=["puntos_rebelde", "puntos_mercader", "puntos_segador"])

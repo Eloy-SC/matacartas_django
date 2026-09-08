@@ -9,3 +9,7 @@ class ResumenMano(models.Model):
     retiradas = models.JSONField(default=dict)
     efectos_inmediatos_ronda = models.JSONField(default=dict) # Claves rondas y valores [(beneficiado1, efecto1), (beneficiado2, efecto2)...]
     efectos_extra_fin_mano = models.JSONField(default=list) # [(beneficiado1, efecto1), (beneficiado2, efecto2)...]
+    puntos_rebelde = models.IntegerField(default=None, null=True)
+    puntos_mercader = models.IntegerField(default=None, null=True)
+    puntos_segador = models.IntegerField(default=None, null=True)
+

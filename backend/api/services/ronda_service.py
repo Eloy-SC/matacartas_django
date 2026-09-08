@@ -1,4 +1,4 @@
-from ..services.resumen_mano_service import recopilar_efecto_extra_fin_mano, recopilar_efecto_inmediato_ronda, recopilar_retirada, recopilar_victoria, recopilar_muerte
+from ..services.resumen_mano_service import recopilar_efecto_extra_fin_mano, recopilar_efecto_inmediato_ronda, recopilar_puntos_extra, recopilar_retirada, recopilar_victoria, recopilar_muerte
 
 from ..models.catalogo_cartas import CATALOGO
 
@@ -502,6 +502,7 @@ def aux_asignar_puntos_extra_final_mano(partida_id):
             puntos_extra += min(cartas_mercancias, 6)
             if cartas_mercancias > 0:
                 recopilar_efecto_extra_fin_mano(mano_actual.id, color, "MERCADER")
+                recopilar_puntos_extra(mano_actual.id, "MERCADER", min(cartas_mercancias, 6))
 
         # REBELDE
         if any(carta.endswith("REBELDE") for carta in cartas_lanzadas_por_jugador):
@@ -509,6 +510,7 @@ def aux_asignar_puntos_extra_final_mano(partida_id):
             puntos_extra += min(cartas_bastos, 8)
             if cartas_bastos > 0:
                 recopilar_efecto_extra_fin_mano(mano_actual.id, color, "REBELDE")
+                recopilar_puntos_extra(mano_actual.id, "REBELDE", min(cartas_bastos, 8))
 
         # SEGADOR
         if any(carta.endswith("SEGADOR") for carta in cartas_lanzadas_por_jugador):
@@ -516,6 +518,7 @@ def aux_asignar_puntos_extra_final_mano(partida_id):
             puntos_extra += min(cartas_valiosas_lanzadas, 6) * 2
             if cartas_valiosas_lanzadas > 0:
                 recopilar_efecto_extra_fin_mano(mano_actual.id, color, "SEGADOR")
+                recopilar_puntos_extra(mano_actual.id, "SEGADOR", min(cartas_valiosas_lanzadas, 6) * 2)
 
         # MONEDERO PECULIAR
         if any(carta.endswith("MONEDERO_PECULIAR") for carta in cartas_lanzadas_por_jugador):

@@ -246,6 +246,7 @@ class Migration(migrations.Migration):
                 ("baraja", models.JSONField(default=list)),
                 ("disposicion_jugadores", models.JSONField(default=list)),
                 ("turno_actual", models.CharField(max_length=8, null=True)),
+                ("puntuacion_asignada_final", models.JSONField(default=dict)),
             ],
         ),
         migrations.CreateModel(
@@ -375,6 +376,9 @@ class Migration(migrations.Migration):
                 ("retiradas", models.JSONField(default=dict)),
                 ("efectos_inmediatos_ronda", models.JSONField(default=dict)),
                 ("efectos_extra_fin_mano", models.JSONField(default=list)),
+                ("puntos_rebelde", models.IntegerField(default=None, null=True)),
+                ("puntos_mercader", models.IntegerField(default=None, null=True)),
+                ("puntos_segador", models.IntegerField(default=None, null=True)),
             ],
         ),
         migrations.CreateModel(
@@ -620,6 +624,76 @@ class Migration(migrations.Migration):
                         to="api.medalla",
                     ),
                 ),
+                (
+                    "logro",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.logro",
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Logro",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=40, unique=True, null=False, blank=False)),
+                ("imagen", models.TextField(blank=True, null=True, default=None, max_length=1000)),
+                ("descripcion", models.TextField(null=False, max_length=1000)),
+            ],
+        ),
+        migrations.CreateModel(
+            name="RequisitoLogro",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "logro",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.logro",
+                    ),
+                ),
+                ("requisito", models.CharField(max_length=50, choices=[
+                    ("puntos_ganados_partida", "Puntos ganados en partida"),
+                    ("puntuacion_acumulada", "Puntuación acumulada"),
+                    ("puntos_ganados_mercader", "Puntos ganados con el Mercader"),
+                    ("puntos_ganados_rebelde", "Puntos ganados con el Rebelde"),
+                    ("puntos_ganados_segador", "Puntos ganados con el Segador"),
+                    ("cartas_victimas_segador", "Cartas víctimas de segador"),
+                    ("puntos_ganados_joyas_reales", "Puntos ganados con joyas reales"),
+                    ("puntos_ganados_vinos_viejos", "Puntos ganados con vinos viejos"),
+                    ("muertes_corrompidas_corruptor", "Muertes corrompidas con el Corruptor"),
+                    ("tumbas_saqueadas_saqueador", "Tumbas saqueadas con el Saqueador"),
+                    ("partidas_ganadas", "Partidas ganadas"),
+                    ("cartas_kills", "Cartas rivales matadas"),
+                    ("cartas_deaths", "Cartas propias matadas"),
+                    ("rondas_ganadas", "Rondas ganadas"),
+                    ("rondas_comodin_ganadas", "Rondas comodín ganadas"),
+                    ("manos_ganadas", "Manos ganadas"),
+                    ("retiradas", "Retiradas"),
+                    ("manos_ganadas_unica", "Manos ganadas con carta única"),
+                    ("contraataques_bastos_punt", "Contraataques con bastos puntiagudos"),
+                    ("tickets_usados", "Tickets usados")
+                ])),
+                ("una_partida", models.BooleanField(default=False)),
+                ("valor_necesario", models.IntegerField(default=1)),
+                ("progreso", models.IntegerField(default=0)),
             ],
         ),
         migrations.RunPython(seed_config_global, reverse_code=migrations.RunPython.noop),
