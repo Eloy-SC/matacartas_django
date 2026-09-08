@@ -1,0 +1,20 @@
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from ..services import estadisticas_service
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_estadisticas_globales(request):
+    """
+    Endpoint para obtener las estadísticas globales de todas las partidas finalizadas.
+    """
+    try:
+        estadisticas = estadisticas_service.get_estadisticas_globales(request.user)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=500)
+    
+    return Response(estadisticas, status=200)
