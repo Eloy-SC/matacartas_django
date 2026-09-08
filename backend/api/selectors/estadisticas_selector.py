@@ -266,3 +266,12 @@ def get_estadisticas_ind_puntos_ganados_en_una_partida(usuario_id):
             if nueva_cant_puntos > puntos:
                 puntos = nueva_cant_puntos
     return puntos
+
+## HISTORIAL PARTIDAS
+
+def get_estadisticas_ind_historial_partidas(usuario_id):
+    pus = PartidaUsuario.objects.filter(usuario_id=usuario_id).order_by("-partida__fecha_fin")[:30]
+    historial = []
+    for pu in pus:
+        historial.append(pu.partida)
+    return historial

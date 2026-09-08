@@ -31,3 +31,16 @@ def get_estadisticas_individuales(request):
         return Response({"detail": str(e)}, status=500)
     
     return Response(estadisticas, status=200)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_historial_partidas(request):
+    """
+    Endpoint para obtener el historial de partidas de un usuario.
+    """
+    try:
+        historial = estadisticas_service.get_historial_partidas(request.user)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=500)
+    
+    return Response(historial, status=200)

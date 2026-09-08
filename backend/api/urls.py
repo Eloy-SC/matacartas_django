@@ -2,7 +2,8 @@ from django.urls import path
 
 from .views.estadisticas_view import (
     get_estadisticas_globales,
-    get_estadisticas_individuales
+    get_estadisticas_individuales,
+    get_historial_partidas
 )
 
 from .views.config_global_view import (
@@ -204,6 +205,7 @@ urlpatterns = [
     # ESTADISTICAS
     path("estadisticas/globales/", get_estadisticas_globales, name="get-estadisticas-globales"),
     path("estadisticas/individuales/", get_estadisticas_individuales, name="get-estadisticas-individuales"),
+    path("estadisticas/individuales/historial/", get_historial_partidas, name="get-historial-partidas"),
 
     # JUEGO
     path("partida/<int:partida_id>/mano/repartir/", repartir_cartas, name="repartir-cartas"),

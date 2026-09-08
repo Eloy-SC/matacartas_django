@@ -53,6 +53,16 @@ function formatRecord(value, suffix) {
     return { name: value[0], value: `${value[1]} ${suffix}` };
 }
 
+function formatDate(value) {
+    if (!value) return "Sin datos";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("es-ES");
+}
+
+function formatBoolean(value) {
+    return value ? "Sí" : "No";
+}
+
 export default function Estadisticas() {
     const navigate = useNavigate();
     const [estadisticas, setEstadisticas] = useState(null);
@@ -61,6 +71,15 @@ export default function Estadisticas() {
     const [estadisticasIndividuales, setEstadisticasIndividuales] = useState(null);
     const [loadingIndividuales, setLoadingIndividuales] = useState(true);
     const [errorIndividuales, setErrorIndividuales] = useState("");
+    const [historial, setHistorial] = useState(null);
+    const [loadingHistorial, setLoadingHistorial] = useState(false);
+    const [errorHistorial, setErrorHistorial] = useState("");
+
+    const DURACION_MANOS = {
+		corta: "20",
+		normal: "40",
+		larga: "60",
+	};
 
     useEffect(() => {
         let cancelled = false;
@@ -87,6 +106,28 @@ export default function Estadisticas() {
             cancelled = true;
         };
     }, []);
+
+    async function handleMostrarHistorial() {
+        setLoadingHistorial(true);
+        setErrorHistorial("");
+
+        try {
+            const response = await fetch("/api/estadisticas/individuales/historial/", {
+                method: "GET",
+                credentials: "include",
+            });
+            const data = await response.json().catch(() => ([]));
+            if (!response.ok) {
+                throw new Error(data?.detail || "No se pudo cargar el historial de partidas");
+            }
+            setHistorial(Array.isArray(data) ? data : []);
+        } catch (requestError) {
+            setErrorHistorial(requestError instanceof Error ? requestError.message : "Error cargando el historial de partidas");
+            setHistorial(null);
+        } finally {
+            setLoadingHistorial(false);
+        }
+    }
 
     useEffect(() => {
         let cancelled = false;
@@ -219,6 +260,48 @@ export default function Estadisticas() {
                     </section>
                 </section>
             )}
+
+            <section className="form-card estadisticas-panel estadisticas-panel--historial" aria-label="Historial de partidas">
+                <h2>Historial de partidas</h2>
+                <button
+                    type="button"
+                    className="estadisticas-history-button"
+                    onClick={handleMostrarHistorial}
+                    disabled={loadingHistorial}
+                >
+                    {loadingHistorial ? "Cargando historial..." : "Mostrar historial de partidas"}
+                </button>
+
+                {errorHistorial && <p className="estadisticas-message estadisticas-message--error">{errorHistorial}</p>}
+                {historial && historial.length === 0 && !errorHistorial && (
+                    <p className="estadisticas-message">Todavía no hay partidas en tu historial.</p>
+                )}
+                {historial && historial.length > 0 && (
+                    <div>
+                        <p className="estadisticas-message">Sólo se muestran las últimas 30 partidas.</p>
+                        <div className="estadisticas-historial-list">
+                            {historial.map((partida) => (
+                                <article className="estadisticas-historial-card" key={partida.partida_id}>
+                                    <div className="estadisticas-historial-card__header">
+                                        <h3>{partida.nombre_partida || "Partida sin nombre"}</h3>
+                                        <span>{formatDate(partida.fecha_fin)}</span>
+                                    </div>
+                                    <div className="estadisticas-historial-card__details">
+                                        <div><span>Inicio</span><strong>{formatDate(partida.fecha_inicio)}</strong></div>
+                                        <div><span>Fin</span><strong>{formatDate(partida.fecha_fin)}</strong></div>
+                                        <div><span>Longitud</span><strong>{DURACION_MANOS[partida.longitud] || "Sin datos"}</strong></div>
+                                        <div><span>Cartas especiales</span><strong>{formatBoolean(partida.cartas_especiales)}</strong></div>
+                                        <div><span>Tickets</span><strong>{formatBoolean(partida.tickets)}</strong></div>
+                                        <div><span>Puntos ganados</span><strong>{partida.puntos_ganados ?? 0}</strong></div>
+                                        <div><span>Cartas matadas</span><strong>{partida.cartas_matadas ?? 0}</strong></div>
+                                        <div><span>Muertes recibidas</span><strong>{partida.muertes_recibidas ?? 0}</strong></div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
