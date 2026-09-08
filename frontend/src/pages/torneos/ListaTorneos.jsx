@@ -96,6 +96,12 @@ export default function ListaTorneos() {
 	const [orderBy, setOrderBy] = useState("id");
 	const [orderDir, setOrderDir] = useState("asc");
 
+	const DURACION_MANOS = {
+		corta: "20",
+		normal: "40",
+		larga: "60",
+	};
+
 	const loadRangos = useCallback(() => {
 		let cancelled = false;
 
@@ -303,11 +309,11 @@ export default function ListaTorneos() {
 								<th>Rango minimo</th>
 								<th>Rango maximo</th>
 								<th>Formato</th>
-								<th>Longitud</th>
+								<th>Manos/partida</th>
 								<th>Reglas</th>
 								<th>Creado</th>
 								<th>Estado</th>
-								<th>Acciones</th>
+								<th> </th>
 							</tr>
 						</thead>
 						<tbody>
@@ -325,7 +331,7 @@ export default function ListaTorneos() {
 											<td>{torneo?.rango_minimo ?? "-"}</td>
 											<td>{torneo?.rango_maximo ?? "-"}</td>
 											<td>{getFaseText(torneo)}</td>
-											<td>{torneo?.partidas_longitud ?? "-"}</td>
+											<td>{DURACION_MANOS[torneo?.partidas_longitud] ?? "-"}</td>
 											<td>{getReglasText(torneo)}</td>
 											<td>{fechaCreacion}</td>
 											<td>

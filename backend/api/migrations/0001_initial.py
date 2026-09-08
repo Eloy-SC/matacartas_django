@@ -4,6 +4,12 @@ from django.db import migrations, models
 import django.utils.timezone
 
 
+def seed_config_global(apps, schema_editor):
+    ConfiguracionGlobal = apps.get_model("api", "ConfiguracionGlobal")
+
+    # Crear la configuración global con el rango mínimo
+    ConfiguracionGlobal.objects.create(rango_minimo_crear_torneo=None)
+
 class Migration(migrations.Migration):
     initial = True
 
@@ -616,4 +622,5 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
+        migrations.RunPython(seed_config_global, reverse_code=migrations.RunPython.noop),
     ]

@@ -4,22 +4,21 @@ from django.utils import timezone
 
 TEST_TORNEOS = [
     {
-        "nombre": "Torneo de Prueba",
-        "num_jug_fin": 3,
-        "num_jug_sem": 3,
-        "num_jug_cua": 3,
-        "num_jug_oct": None,
-        "partidas_longitud": "normal",
+        "nombre": "Torneo Largo de Prueba",
+        "num_jug_fin": 4,
+        "num_jug_sem": 4,
+        "num_jug_cua": 4,
+        "num_jug_oct": 4,
+        "partidas_longitud": "larga",
         "partidas_cartas_especiales": True,
         "partidas_tickets": True,
-        "partidas_tiempo_max_turno": 90,
+        "partidas_tiempo_max_turno": 120,
         "desempate_mayor_punt": True,
-        "rango_minimo": "PRINCIPIANTE",
+        "rango_minimo": "VETERANO",
         "rango_maximo": "MAESTRO SUPREMO CELESTIAL",
     },
     {
         "nombre": "Torneo Corto Prueba",
-        "fecha_inicio": timezone.now(),
         "num_jug_fin": 2,
         "num_jug_sem": 2,
         "num_jug_cua": None,
@@ -32,63 +31,121 @@ TEST_TORNEOS = [
         "rango_minimo": None,
         "rango_maximo": None,
     },
-]
-
-TEST_PARTIDAS_TORNEO = [
     {
-        "partida": "Partida 1",
-        "torneo": "Torneo Corto Prueba",
-        "fase": "semifinal",
-        "lado": 0,
-        "pareja": 0,
-        "posiciones_finales": {1: 120, 2: 80},
+        "nombre": "Torneo Nombre Muy Largo Para Probar Lim",
+        "num_jug_fin": 3,
+        "num_jug_sem": 3,
+        "num_jug_cua": 3,
+        "num_jug_oct": None,
+        "partidas_longitud": "corta",
+        "partidas_cartas_especiales": False,
+        "partidas_tickets": False,
+        "partidas_tiempo_max_turno": 60,
+        "desempate_mayor_punt": False,
+        "rango_minimo": None,
+        "rango_maximo": None,
     },
     {
-        "partida": "Partida 2",
-        "torneo": "Torneo Corto Prueba",
-        "fase": "semifinal",
-        "lado": 0,
-        "pareja": 0,
-        "posiciones_finales": {1: 90, 2: 85},
-    },
-    {
-        "partida": "Partida 3",
-        "torneo": "Torneo Corto Prueba",
-        "fase": "final",
-        "lado": 0,
-        "pareja": 0,
-        "posiciones_finales": {},
+        "nombre": "T",
+        "num_jug_fin": 3,
+        "num_jug_sem": 3,
+        "num_jug_cua": None,
+        "num_jug_oct": None,
+        "partidas_longitud": "corta",
+        "partidas_cartas_especiales": False,
+        "partidas_tickets": False,
+        "partidas_tiempo_max_turno": 60,
+        "desempate_mayor_punt": False,
+        "rango_minimo": None,
+        "rango_maximo": None,
     },
 ]
 
 TEST_MEDALLAS = [
     {
-        "nombre": "Campeon del Torneo 2026",
+        "nombre": "Campeon del Torneo Agosto 2026",
         "categoria": "oro",
         "imagen": None,
     },
     {
-        "nombre": "Subcampeon del Torneo 2026",
+        "nombre": "Subcampeon del Torneo Agosto 2026",
         "categoria": "plata",
         "imagen": None,
     },
     {
-        "nombre": "Tercer Puesto del Torneo 2026",
+        "nombre": "Tercer Puesto del Torneo Agosto 2026",
+        "categoria": "bronce",
+        "imagen": None,
+    },
+    {
+        "nombre": "Tercer Puesto Generico Nombre Muuy Largo",
         "categoria": "bronce",
         "imagen": None,
     },
 ]
 
+TEST_MEDALLAS_TORNEO = [
+    {
+        "torneo": "Torneo Largo de Prueba",
+        "medalla": "Campeon del Torneo Agosto 2026",
+        "puesto": 1,
+    },
+    {
+        "torneo": "Torneo Largo de Prueba",
+        "medalla": "Subcampeon del Torneo Agosto 2026",
+        "puesto": 2,
+    },
+    {
+        "torneo": "Torneo Largo de Prueba",
+        "medalla": "Tercer Puesto del Torneo Agosto 2026",
+        "puesto": 3,
+    },
+    {
+        "torneo": "Torneo Corto Prueba",
+        "medalla": "Campeon del Torneo Agosto 2026",
+        "puesto": 1,
+    },
+    {
+        "torneo": "Torneo Corto Prueba",
+        "medalla": "Subcampeon del Torneo Agosto 2026",
+        "puesto": 2,
+    },
+    {
+        "torneo": "Torneo Nombre Muy Largo Para Probar Lim",
+        "medalla": "Campeon del Torneo Agosto 2026",
+        "puesto": 1,
+    },
+    {
+        "torneo": "Torneo Nombre Muy Largo Para Probar Lim",
+        "medalla": "Subcampeon del Torneo Agosto 2026",
+        "puesto": 2,
+    },
+    {
+        "torneo": "T",
+        "medalla": "Campeon del Torneo Agosto 2026",
+        "puesto": 1,
+    },
+    {
+        "torneo": "T",
+        "medalla": "Subcampeon del Torneo Agosto 2026",
+        "puesto": 2,
+    },
+]
 
 def _resolve_rango(rango_model, nombre):
     if not nombre:
         return None
     return rango_model.objects.get(nombre=nombre)
 
+def _resolve_medalla(medalla_model, nombre):
+    if not nombre:
+        return None
+    return medalla_model.objects.get(nombre=nombre)
 
 def seed_test_torneos(apps, schema_editor):
     Torneo = apps.get_model("api", "Torneo")
     Rango = apps.get_model("api", "Rango")
+    MedallaTorneo = apps.get_model("api", "MedallaTorneo")
 
     for torneo_spec in TEST_TORNEOS:
         defaults = {
@@ -106,8 +163,17 @@ def seed_test_torneos(apps, schema_editor):
             "rango_maximo": _resolve_rango(Rango, torneo_spec["rango_maximo"]),
         }
         Torneo.objects.update_or_create(nombre=torneo_spec["nombre"], defaults=defaults)
+    for medalla_torneo_spec in TEST_MEDALLAS_TORNEO:
+        torneo = Torneo.objects.get(nombre=medalla_torneo_spec["torneo"])
+        medalla = _resolve_medalla(apps.get_model("api", "Medalla"), medalla_torneo_spec["medalla"])
+        MedallaTorneo.objects.update_or_create(
+            torneo=torneo,
+            medalla=medalla,
+            defaults={"puesto": medalla_torneo_spec["puesto"]},
+        )
+        
 
-
+"""
 def seed_test_partidas_torneo(apps, schema_editor):
     Partida = apps.get_model("api", "Partida")
     PartidaTorneo = apps.get_model("api", "PartidaTorneo")
@@ -127,7 +193,7 @@ def seed_test_partidas_torneo(apps, schema_editor):
             **lookup,
             defaults={"posiciones_finales": partida_torneo_spec["posiciones_finales"]},
         )
-
+"""
 
 def seed_test_medallas(apps, schema_editor):
     Medalla = apps.get_model("api", "Medalla")
@@ -147,18 +213,20 @@ def unseed_test_medallas(apps, schema_editor):
     nombres = [medalla["nombre"] for medalla in TEST_MEDALLAS]
     Medalla.objects.filter(nombre__in=nombres).delete()
 
-
+"""
 def unseed_test_partidas_torneo(apps, schema_editor):
     PartidaTorneo = apps.get_model("api", "PartidaTorneo")
     Torneo = apps.get_model("api", "Torneo")
     nombres_torneos = [torneo["nombre"] for torneo in TEST_TORNEOS]
     PartidaTorneo.objects.filter(torneo__nombre__in=nombres_torneos).delete()
-
+"""
 
 def unseed_test_torneos(apps, schema_editor):
     Torneo = apps.get_model("api", "Torneo")
     nombres = [torneo["nombre"] for torneo in TEST_TORNEOS]
     Torneo.objects.filter(nombre__in=nombres).delete()
+    MedallaTorneo = apps.get_model("api", "MedallaTorneo")
+    MedallaTorneo.objects.all().delete()
 
 
 class Migration(migrations.Migration):
@@ -167,7 +235,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(seed_test_torneos, reverse_code=unseed_test_torneos),
-        migrations.RunPython(seed_test_partidas_torneo, reverse_code=unseed_test_partidas_torneo),
         migrations.RunPython(seed_test_medallas, reverse_code=unseed_test_medallas),
+        migrations.RunPython(seed_test_torneos, reverse_code=unseed_test_torneos),
+        #migrations.RunPython(seed_test_partidas_torneo, reverse_code=unseed_test_partidas_torneo),
     ]
