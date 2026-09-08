@@ -599,6 +599,23 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name="Logro",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=40, unique=True, null=False, blank=False)),
+                ("imagen", models.TextField(blank=True, null=True, default=None, max_length=1000)),
+                ("descripcion", models.TextField(null=False, max_length=1000)),
+            ],
+        ),
+        migrations.CreateModel(
             name="RecompensaUsuario",
             fields=[
                 (
@@ -631,23 +648,6 @@ class Migration(migrations.Migration):
                         to="api.logro",
                     ),
                 ),
-            ],
-        ),
-        migrations.CreateModel(
-            name="Logro",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("nombre", models.CharField(max_length=40, unique=True, null=False, blank=False)),
-                ("imagen", models.TextField(blank=True, null=True, default=None, max_length=1000)),
-                ("descripcion", models.TextField(null=False, max_length=1000)),
             ],
         ),
         migrations.CreateModel(

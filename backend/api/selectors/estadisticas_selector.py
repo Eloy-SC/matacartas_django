@@ -1,5 +1,7 @@
 
 
+from backend.api.models.partida_usuario import PartidaUsuario
+
 from ..selectors.resumen_mano_selector import get_resumen_mano_by_mano_id
 
 from ..selectors.mano_selector import get_manos_de_partida
@@ -139,3 +141,128 @@ def get_estadisticas_glob_partida_mas_corta():
             duracion_minima = duracion
             partida_mas_corta = p
     return (partida_mas_corta.nombre, duracion_minima) if partida_mas_corta else (None, 0)
+
+
+## ESTADISTICAS INDIVIDUALES
+
+def get_estadisticas_ind_partidas_jugadas(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_partidas = 0
+    for pu in partida_usuarios:
+        if pu.partida.fecha_fin is not None:
+            cant_partidas += 1
+    return cant_partidas
+
+def get_estadisticas_ind_cartas_matadas(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_cartas_matadas = 0
+    for pu in partida_usuarios:
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_muertes = resumen.muertes
+                    for ronda, (matador, matado) in dic_muertes.items():
+                        if matador == pu.color:
+                            cant_cartas_matadas += 1
+    return cant_cartas_matadas
+
+def get_estadisticas_ind_muertes_recibibidas(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_muertes_recibidas = 0
+    for pu in partida_usuarios:
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_muertes = resumen.muertes
+                    for ronda, (matador, matado) in dic_muertes.items():
+                        if matado == pu.color:
+                            cant_muertes_recibidas += 1
+    return cant_muertes_recibidas
+
+def get_estadisticas_ind_retiradas(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_retiradas = 0
+    for pu in partida_usuarios:
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_retiradas = resumen.retiradas
+                    for ronda, retiradas_ronda in dic_retiradas.items():
+                        if pu.color in retiradas_ronda:
+                            cant_retiradas += 1
+    return cant_retiradas
+
+def get_estadisticas_ind_puntos_ganados(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    puntos_totales = 0
+    for pu in partida_usuarios:
+        if pu.partida.fecha_fin is not None:
+            puntos_totales += pu.puntos
+    return puntos_totales
+
+## RECORDS INDIVIDUALES
+
+def get_estadisticas_ind_cartas_matadas_en_una_partida(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_cartas_matadas = 0
+    for pu in partida_usuarios:
+        nueva_cant_cartas_matadas = 0
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_muertes = resumen.muertes
+                    for ronda, (matador, matado) in dic_muertes.items():
+                        if matador == pu.color:
+                            nueva_cant_cartas_matadas += 1
+            if nueva_cant_cartas_matadas > cant_cartas_matadas:
+                cant_cartas_matadas = nueva_cant_cartas_matadas
+    return cant_cartas_matadas
+
+def get_estadisticas_ind_muertes_recibibidas_en_una_partida(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_muertes_recibidas = 0
+    for pu in partida_usuarios:
+        nueva_cant_muertes_recibidas = 0
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_muertes = resumen.muertes
+                    for ronda, (matador, matado) in dic_muertes.items():
+                        if matado == pu.color:
+                            nueva_cant_muertes_recibidas += 1
+            if nueva_cant_muertes_recibidas > cant_muertes_recibidas:
+                cant_muertes_recibidas = nueva_cant_muertes_recibidas
+    return cant_muertes_recibidas
+
+def get_estadisticas_ind_retiradas_en_una_partida(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    cant_retiradas = 0
+    for pu in partida_usuarios:
+        nueva_cant_retiradas = 0
+        if pu.partida.fecha_fin is not None:
+            for mano in get_manos_de_partida(pu.partida.id):
+                resumen = get_resumen_mano_by_mano_id(mano.id)
+                if resumen:
+                    dic_retiradas = resumen.retiradas
+                    for ronda, retiradas_ronda in dic_retiradas.items():
+                        if pu.color in retiradas_ronda:
+                            nueva_cant_retiradas += 1
+            if nueva_cant_retiradas > cant_retiradas:
+                cant_retiradas = nueva_cant_retiradas
+    return cant_retiradas
+
+def get_estadisticas_ind_puntos_ganados_en_una_partida(usuario_id):
+    partida_usuarios = PartidaUsuario.objects.filter(usuario_id=usuario_id)
+    puntos = 0
+    for pu in partida_usuarios:
+        nueva_cant_puntos = 0
+        if pu.partida.fecha_fin is not None:
+            nueva_cant_puntos = pu.puntos
+            if nueva_cant_puntos > puntos:
+                puntos = nueva_cant_puntos
+    return puntos

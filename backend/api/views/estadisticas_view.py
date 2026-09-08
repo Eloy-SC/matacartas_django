@@ -18,3 +18,16 @@ def get_estadisticas_globales(request):
         return Response({"detail": str(e)}, status=500)
     
     return Response(estadisticas, status=200)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_estadisticas_individuales(request):
+    """
+    Endpoint para obtener las estadísticas individuales de un usuario.
+    """
+    try:
+        estadisticas = estadisticas_service.get_estadisticas_individuales(request.user)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=500)
+    
+    return Response(estadisticas, status=200)

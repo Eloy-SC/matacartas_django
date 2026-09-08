@@ -24,6 +24,7 @@ import RecuperarPassword from "./pages/RecuperarPassword.jsx";
 import RestablecerPassword from "./pages/RestablecerPassword.jsx";
 import VerificarEmail from "./pages/VerificarEmail.jsx";
 import Juego from "./pages/juego/Juego.jsx";
+import Estadisticas from "./pages/estadisticas_recompensas/Estadisticas.jsx";
 import "./index.css";
 import "./styles/main.css";
 
@@ -263,6 +264,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/torneos" element={ <RequireAuth> <ListaTorneos /> </RequireAuth>}/>
         <Route path="/crear-torneo" element={ <RequireAuth> <CrearTorneo /> </RequireAuth>}/>
         <Route path="/torneos/:torneoId" element={ <RequireAuth> <Torneo /> </RequireAuth>}/>
+        <Route path="/estadisticas" element={ <RequireAuth> <Estadisticas /> </RequireAuth>}/>
 
         {/* Necesario iniciar sesión y participar en la partida */}
         <Route path="/partidas/sala-de-espera/:partidaId" element={ <RequireParticipatingNotStartNotTorneo> <SalaEsperaPartida /> </RequireParticipatingNotStartNotTorneo>}/>

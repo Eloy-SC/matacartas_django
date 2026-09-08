@@ -1,5 +1,10 @@
 from django.urls import path
 
+from .views.estadisticas_view import (
+    get_estadisticas_globales,
+    get_estadisticas_individuales
+)
+
 from .views.config_global_view import (
     obtener_rango_minimo_crear_torneo,
     cambiar_rango_minimo_crear_torneo,
@@ -195,6 +200,10 @@ urlpatterns = [
     path("torneos/<int:torneo_id>/abandonar/", abandonar_torneo, name="abandonar-torneo"),
     path("torneos/<int:torneo_id>/partida_actual/", get_partida_actual_de_torneo, name="get-partida-actual-de-torneo"),
     path("torneos/<int:torneo_id>/partidas/", get_partidas_de_torneo, name="get-partidas-de-torneo"),
+
+    # ESTADISTICAS
+    path("estadisticas/globales/", get_estadisticas_globales, name="get-estadisticas-globales"),
+    path("estadisticas/individuales/", get_estadisticas_individuales, name="get-estadisticas-individuales"),
 
     # JUEGO
     path("partida/<int:partida_id>/mano/repartir/", repartir_cartas, name="repartir-cartas"),
