@@ -139,6 +139,24 @@ label {
   line-height: 1;
 }
 
+.estad-inicio-button {
+  position: absolute;
+  top: 30px;
+  right: 200px;
+  appearance: none;
+  border: 2px solid var(--ui-accent);
+  background-image: var(--form-card-texture);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  color: var(--ui-accent);
+  border-radius: 0;
+  padding: 12px 18px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
 .avatar-button {
   position: absolute;
   top: 30px;

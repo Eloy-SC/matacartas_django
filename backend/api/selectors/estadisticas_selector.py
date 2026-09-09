@@ -1,6 +1,6 @@
 
 
-from backend.api.models.partida_usuario import PartidaUsuario
+from ..models.partida_usuario import PartidaUsuario
 
 from ..selectors.resumen_mano_selector import get_resumen_mano_by_mano_id
 
@@ -270,7 +270,7 @@ def get_estadisticas_ind_puntos_ganados_en_una_partida(usuario_id):
 ## HISTORIAL PARTIDAS
 
 def get_estadisticas_ind_historial_partidas(usuario_id):
-    pus = PartidaUsuario.objects.filter(usuario_id=usuario_id).order_by("-partida__fecha_fin")[:30]
+    pus = PartidaUsuario.objects.filter(usuario_id=usuario_id, partida__fecha_fin__isnull=False).order_by("-partida__fecha_fin")[:30]
     historial = []
     for pu in pus:
         historial.append(pu.partida)

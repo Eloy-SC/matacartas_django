@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cabecera from "../../assets/cabecera.png";
 import "../../styles/estadisticas.css";
+import { obtenerCsrfToken } from "../../utils/ObtenerCsfrToken";
 
 const metricasPrincipales = [
     { key: "partidas_totales", label: "Partidas totales" },
@@ -76,6 +77,7 @@ export default function Estadisticas() {
     const [errorHistorial, setErrorHistorial] = useState("");
 
     const DURACION_MANOS = {
+        express: "5",
 		corta: "20",
 		normal: "40",
 		larga: "60",
@@ -112,9 +114,15 @@ export default function Estadisticas() {
         setErrorHistorial("");
 
         try {
+            const csrfToken = await obtenerCsrfToken();
+
             const response = await fetch("/api/estadisticas/individuales/historial/", {
                 method: "GET",
                 credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
             });
             const data = await response.json().catch(() => ([]));
             if (!response.ok) {
@@ -252,8 +260,8 @@ export default function Estadisticas() {
                             {recordsIndividuales.map(({ key, label, suffix }) => (
                                 <div className="estadisticas-record" key={key}>
                                     <span>{label}</span>
-                                    <strong>{estadisticasIndividuales[key] ?? 0}</strong>
-                                    <small>{suffix}</small>
+                                    <span><strong>{estadisticasIndividuales[key] ?? 0}</strong> <small>{suffix}</small>
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -289,10 +297,10 @@ export default function Estadisticas() {
                                     <div className="estadisticas-historial-card__details">
                                         <div><span>Inicio</span><strong>{formatDate(partida.fecha_inicio)}</strong></div>
                                         <div><span>Fin</span><strong>{formatDate(partida.fecha_fin)}</strong></div>
-                                        <div><span>Longitud</span><strong>{DURACION_MANOS[partida.longitud] || "Sin datos"}</strong></div>
+                                        <div><span>Longitud</span><strong>{DURACION_MANOS[partida.longitud] || "?"} manos</strong></div>
                                         <div><span>Cartas especiales</span><strong>{formatBoolean(partida.cartas_especiales)}</strong></div>
                                         <div><span>Tickets</span><strong>{formatBoolean(partida.tickets)}</strong></div>
-                                        <div><span>Puntos ganados</span><strong>{partida.puntos_ganados ?? 0}</strong></div>
+                                        <div><span>Puntos</span><strong>{partida.puntos_ganados ?? 0}</strong></div>
                                         <div><span>Cartas matadas</span><strong>{partida.cartas_matadas ?? 0}</strong></div>
                                         <div><span>Muertes recibidas</span><strong>{partida.muertes_recibidas ?? 0}</strong></div>
                                     </div>

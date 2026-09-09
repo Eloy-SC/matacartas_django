@@ -74,4 +74,4 @@ def get_historial_partidas(actor):
             "muertes_recibidas": pu.acumulador_deaths if pu else None,
         })
 
-    return 
+    return data
