@@ -78,7 +78,7 @@ export default function CrearTorneo() {
 					const detail = data?.detail || "No se pudieron cargar las medallas";
 					throw new Error(detail);
 				}
-				setMedallas(Array.isArray(data) ? data : []);
+				setMedallas(Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []));
 			})
 			.catch((e) => {
 				if (cancelled) return;

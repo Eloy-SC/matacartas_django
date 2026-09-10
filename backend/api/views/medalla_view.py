@@ -12,8 +12,30 @@ from ..services import medalla_service
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def listar_medallas(request):
+    page_param = request.query_params.get("page", "1")
     try:
-        medallas = medalla_service.listar_medallas(request.user)
+        page = max(1, int(page_param))
+    except (TypeError, ValueError):
+        page = 1
+
+    search = (request.query_params.get("search") or "").strip() or None
+    nombre = (request.query_params.get("nombre") or "").strip() or None
+    categoria = (request.query_params.get("categoria") or "").strip() or None
+    ordering_param = (request.query_params.get("ordering") or "nombre").strip()
+    order_dir = "desc" if ordering_param.startswith("-") else "asc"
+    order_by = ordering_param.lstrip("-") or "nombre"
+
+    try:
+        paged = medalla_service.listar_medallas_paginated(
+            request.user,
+            page=page,
+            page_size=10,
+            search=search,
+            nombre=nombre,
+            categoria=categoria,
+            order_by=order_by,
+            order_dir=order_dir,
+        )
     except PermissionError as e:
         return Response({"detail": str(e)}, status=403)
 
@@ -24,10 +46,19 @@ def listar_medallas(request):
             "categoria": medalla["categoria"],
             "imagen": medalla["imagen"],
         }
-        for medalla in medallas
+        for medalla in paged["items"]
     ]
 
-    return Response(data, status=200)
+    return Response(
+        {
+            "items": data,
+            "page": paged["page"],
+            "page_size": paged["page_size"],
+            "total": paged["total"],
+            "total_pages": paged["total_pages"],
+        },
+        status=200,
+    )
 
 
 @api_view(["GET"])
@@ -42,10 +73,10 @@ def get_medalla(request, medalla_id):
         return Response({"detail": "Medalla no encontrada"}, status=404)
 
     data = {
-        "id": medalla["id"],
-        "nombre": medalla["nombre"],
-        "categoria": medalla["categoria"],
-        "imagen": medalla["imagen"],
+        "id": medalla.id,
+        "nombre": medalla.nombre,
+        "categoria": medalla.categoria,
+        "imagen": medalla.imagen,
     }
 
     return Response(data, status=200)

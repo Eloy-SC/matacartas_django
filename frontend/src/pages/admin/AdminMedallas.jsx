@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/admin.css";
 import { obtenerCsrfToken } from "../../utils/ObtenerCsfrToken";
@@ -10,6 +10,11 @@ const CATEGORIA_LABELS = {
 	bronce: "BRONCE",
 };
 
+const ORDER_FIELDS = [
+	{ value: "nombre", label: "Nombre" },
+	{ value: "categoria", label: "Categoría" },
+];
+
 export default function AdminMedallas() {
 	const navigate = useNavigate();
 	const [medallas, setMedallas] = useState([]);
@@ -17,26 +22,44 @@ export default function AdminMedallas() {
 	const [error, setError] = useState("");
 	const [deletingId, setDeletingId] = useState(null);
 	const [search, setSearch] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("");
+	const [selectedCategoria, setSelectedCategoria] = useState("");
+	const [orderBy, setOrderBy] = useState("nombre");
+	const [orderDir, setOrderDir] = useState("asc");
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const [totalMedallas, setTotalMedallas] = useState(0);
 
-	const loadMedallas = useCallback(() => {
+	const loadMedallas = useCallback((pageNumber = 1) => {
 		let cancelled = false;
 		setLoading(true);
 		setError("");
 
-		fetch("/api/medallas/listar/", { method: "GET", credentials: "include" })
+		const params = new URLSearchParams();
+		params.set("page", String(pageNumber));
+		if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
+		if (selectedCategoria) params.set("categoria", selectedCategoria);
+		if (orderBy) params.set("ordering", orderDir === "desc" ? `-${orderBy}` : orderBy);
+
+		fetch(`/api/medallas/listar/?${params.toString()}`, { method: "GET", credentials: "include" })
 			.then(async (res) => {
-				const data = await res.json().catch(() => []);
+				const data = await res.json().catch(() => ({}));
 				if (cancelled) return;
 				if (!res.ok) {
 					const detail = data?.detail || "No se pudo cargar la lista de medallas";
 					throw new Error(detail);
 				}
-				setMedallas(Array.isArray(data) ? data : []);
+				setMedallas(Array.isArray(data?.items) ? data.items : []);
+				setPage(typeof data?.page === "number" ? data.page : pageNumber);
+				setTotalPages(typeof data?.total_pages === "number" ? data.total_pages : 1);
+				setTotalMedallas(typeof data?.total === "number" ? data.total : 0);
 			})
 			.catch((e) => {
 				if (cancelled) return;
 				setError(e instanceof Error ? e.message : "Error cargando medallas");
 				setMedallas([]);
+				setTotalMedallas(0);
+				setTotalPages(1);
 			})
 			.finally(() => {
 				if (cancelled) return;
@@ -46,14 +69,23 @@ export default function AdminMedallas() {
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [debouncedSearch, selectedCategoria, orderBy, orderDir]);
 
 	useEffect(() => {
-		const cancel = loadMedallas();
+		const cancel = loadMedallas(page);
 		return () => {
 			if (typeof cancel === "function") cancel();
 		};
-	}, [loadMedallas]);
+	}, [loadMedallas, page]);
+
+	useEffect(() => {
+		const timeoutId = setTimeout(() => setDebouncedSearch(search), 300);
+		return () => clearTimeout(timeoutId);
+	}, [search]);
+
+	useEffect(() => {
+		setPage(1);
+	}, [debouncedSearch, selectedCategoria, orderBy, orderDir]);
 
 	async function handleDelete(medallaId) {
 		if (!medallaId || deletingId) return;
@@ -78,23 +110,13 @@ export default function AdminMedallas() {
 				throw new Error(data?.detail || "No se pudo eliminar la medalla");
 			}
 
-			loadMedallas();
+			loadMedallas(page);
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Error eliminando medalla");
 		} finally {
 			setDeletingId(null);
 		}
 	}
-
-	const filteredMedallas = useMemo(() => {
-		const term = search.trim().toLowerCase();
-		if (!term) return medallas;
-		return medallas.filter((medalla) => {
-			const nombre = (medalla?.nombre ?? "").toLowerCase();
-			const categoria = (medalla?.categoria ?? "").toLowerCase();
-			return nombre.includes(term) || categoria.includes(term);
-		});
-	}, [medallas, search]);
 
 	return (
 		<div className="app">
@@ -114,6 +136,41 @@ export default function AdminMedallas() {
 					onChange={(e) => setSearch(e.target.value)}
 					disabled={loading}
 				/>
+				<select
+					className="admin-search-input"
+					value={selectedCategoria}
+					onChange={(e) => setSelectedCategoria(e.target.value)}
+					aria-label="Filtrar por categoría"
+					disabled={loading}
+				>
+					<option value="">Todas las categorías</option>
+					<option value="oro">Oro</option>
+					<option value="plata">Plata</option>
+					<option value="bronce">Bronce</option>
+				</select>
+				<select
+					className="admin-search-input"
+					value={orderBy}
+					onChange={(e) => setOrderBy(e.target.value)}
+					aria-label="Ordenar medallas por"
+					disabled={loading}
+				>
+					{ORDER_FIELDS.map((field) => (
+						<option key={field.value} value={field.value}>
+							Ordenar: {field.label}
+						</option>
+					))}
+				</select>
+				<select
+					className="admin-search-input"
+					value={orderDir}
+					onChange={(e) => setOrderDir(e.target.value)}
+					aria-label="Dirección de ordenación"
+					disabled={loading}
+				>
+					<option value="asc">Ascendente</option>
+					<option value="desc">Descendente</option>
+				</select>
 				<button
 					type="button"
 					className="admin-primary-button"
@@ -141,12 +198,12 @@ export default function AdminMedallas() {
 							</tr>
 						</thead>
 						<tbody>
-							{filteredMedallas.length === 0 ? (
+							{medallas.length === 0 ? (
 								<tr>
 									<td colSpan={4}>No hay medallas.</td>
 								</tr>
 							) : (
-								filteredMedallas.map((medalla) => (
+								medallas.map((medalla) => (
 									<tr key={medalla.id ?? medalla.nombre}>
 										<td>{medalla.nombre ?? ""}</td>
 										<td>{CATEGORIA_LABELS[medalla.categoria] ?? medalla.categoria ?? ""}</td>
@@ -205,6 +262,27 @@ export default function AdminMedallas() {
 							)}
 						</tbody>
 					</table>
+					<div className="admin-pagination">
+						<button
+							type="button"
+							className="admin-secondary-button"
+							onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+							disabled={loading || page <= 1}
+						>
+							Anterior
+						</button>
+						<span className="admin-pagination__info">
+							Página {page} de {totalPages} ({totalMedallas} medallas)
+						</span>
+						<button
+							type="button"
+							className="admin-secondary-button"
+							onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+							disabled={loading || page >= totalPages}
+						>
+							Siguiente
+						</button>
+					</div>
 				</div>
 			)}
 		</div>
