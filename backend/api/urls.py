@@ -84,7 +84,7 @@ from .views.medalla_view import (
     get_medalla,
     listar_medallas,
 )
-from .views.logro_view import crear_logro
+from .views.logro_view import crear_logro, listar_logros
 from .views.torneo_view import (
     crear_torneo,
     get_partida_actual_de_torneo,
@@ -172,6 +172,7 @@ urlpatterns = [
     ),
 
     # LOGROS
+    path("logros/listar/", listar_logros, name="listar-logros"),
     path("logros/admin/crear/", crear_logro, name="crear-logro-admin"),
 
     # CONFIGURACION GLOBAL
