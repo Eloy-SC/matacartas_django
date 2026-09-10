@@ -64,6 +64,19 @@ def listar_logros(request):
     )
 
 
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def eliminar_logro_admin(request, logro_id):
+    try:
+        logro_service.eliminar_logro_admin(request.user, logro_id)
+    except PermissionError as e:
+        return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+    except ValueError as e:
+        return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({"detail": "Logro eliminado"}, status=status.HTTP_200_OK)
+
+
 def _logro_response(logro):
     return {
         "id": logro.id,

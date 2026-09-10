@@ -84,3 +84,14 @@ def listar_logros_paginated(
         "total_pages": max(1, (total + page_size - 1) // page_size),
     }
 
+
+def eliminar_logro_admin(actor, logro_id):
+    if not actor.is_staff:
+        raise PermissionError("No tienes permiso para eliminar un logro")
+
+    logro = Logro.objects.filter(id=logro_id).first()
+    if logro is None:
+        raise ValueError("No se encontró el logro a eliminar")
+
+    logro.delete()
+

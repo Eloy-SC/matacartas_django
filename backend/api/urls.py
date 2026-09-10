@@ -84,7 +84,7 @@ from .views.medalla_view import (
     get_medalla,
     listar_medallas,
 )
-from .views.logro_view import crear_logro, listar_logros
+from .views.logro_view import crear_logro, eliminar_logro_admin, listar_logros
 from .views.torneo_view import (
     crear_torneo,
     get_partida_actual_de_torneo,
@@ -174,6 +174,7 @@ urlpatterns = [
     # LOGROS
     path("logros/listar/", listar_logros, name="listar-logros"),
     path("logros/admin/crear/", crear_logro, name="crear-logro-admin"),
+    path("logros/admin/<int:logro_id>/eliminar/", eliminar_logro_admin, name="eliminar-logro-admin"),
 
     # CONFIGURACION GLOBAL
     path("config-global/rango-minimo/torneos/", obtener_rango_minimo_crear_torneo, name="obtener-rango-minimo-torneos"),

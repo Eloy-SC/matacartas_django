@@ -15,6 +15,9 @@ export default function AdminRecompensas() {
 				<button type="button" className="admin-primary-button" onClick={() => navigate("/admin/recompensas/medallas")}>
 					MEDALLAS
 				</button>
+				<button type="button" className="admin-primary-button" onClick={() => navigate("/admin/recompensas/logros")}>
+					LOGROS
+				</button>
 			</div>
 		</div>
 	);
