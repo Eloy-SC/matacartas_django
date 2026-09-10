@@ -33,7 +33,6 @@ def crear_logro(request):
         "descripcion": logro.descripcion,
         "imagen": logro.imagen,
         "oculto": logro.oculto,
-        "progreso_oculto": logro.progreso_oculto,
         "requisitos": [
             {
                 "id": requisito.id,

@@ -22,7 +22,6 @@ class Medalla(Recompensa):
 class Logro(Recompensa):
     descripcion = models.TextField(null=False, max_length=1000)
     oculto = models.BooleanField(null=False, default=False)  # Indica si el logro es visible para los usuarios o no
-    progreso_oculto = models.BooleanField(null=False, default=False)  # Indica si el progreso del logro es visible para los usuarios o no
 
 class RequisitoLogro(models.Model):
     class Requisito(models.TextChoices):
@@ -56,7 +55,6 @@ class RequisitoLogro(models.Model):
     requisito = models.CharField(max_length=50, choices=Requisito.choices)
     una_partida = models.BooleanField(default=False) # Indica si el requisito se debe cumplir en una sola partida o de forma acumulativa. No es compatible con algunos tipos de requisito
     valor_necesario = models.IntegerField(default=1) # Valor necesario para cumplir el requisito y obtener el logro
-    progreso = models.IntegerField(default=0) # Atributo para almacenar el progreso y no tener que recalcularlo
 
 class RecompensaUsuario(models.Model):
     usuario = models.ForeignKey(

@@ -6,7 +6,7 @@ from ..models.recompensa import Logro, RequisitoLogro
 from ..utils.exceptions import RegistrationError
 
 
-def crear_logro(actor, *, nombre, descripcion, imagen=None, oculto=False, progreso_oculto=False, requisitos):
+def crear_logro(actor, *, nombre, descripcion, imagen=None, oculto=False, requisitos):
     """
     Crea un nuevo logro en la base de datos.
     """
@@ -24,7 +24,6 @@ def crear_logro(actor, *, nombre, descripcion, imagen=None, oculto=False, progre
                 descripcion=descripcion,
                 imagen=imagen,
                 oculto=oculto,
-                progreso_oculto=progreso_oculto,
             )
             RequisitoLogro.objects.bulk_create(
                 [

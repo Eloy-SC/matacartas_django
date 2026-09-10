@@ -614,7 +614,6 @@ class Migration(migrations.Migration):
                 ("imagen", models.TextField(blank=True, null=True, default=None, max_length=1000)),
                 ("descripcion", models.TextField(null=False, max_length=1000)),
                 ("oculto", models.BooleanField(null=False, default=False)),
-                ("progreso_oculto", models.BooleanField(null=False, default=False)),
             ],
         ),
         migrations.CreateModel(
@@ -695,7 +694,6 @@ class Migration(migrations.Migration):
                 ])),
                 ("una_partida", models.BooleanField(default=False)),
                 ("valor_necesario", models.IntegerField(default=1)),
-                ("progreso", models.IntegerField(default=0)),
             ],
         ),
         migrations.RunPython(seed_config_global, reverse_code=migrations.RunPython.noop),

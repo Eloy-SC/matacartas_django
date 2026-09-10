@@ -47,10 +47,6 @@ class LogroSerializer(serializers.Serializer):
         required=False,
         default=False,
     )
-    progreso_oculto = serializers.BooleanField(
-        required=False,
-        default=False,
-    )
     requisitos = serializers.ListField(
         child=RequisitoLogroSerializer(),
         required=True,
