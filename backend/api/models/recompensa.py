@@ -21,8 +21,8 @@ class Medalla(Recompensa):
 
 class Logro(Recompensa):
     descripcion = models.TextField(null=False, max_length=1000)
-    oculto = models.BooleanField(default=False)  # Indica si el logro es visible para los usuarios o no
-    progreso_oculto = models.BooleanField(default=False)  # Indica si el progreso del logro es visible para los usuarios o no
+    oculto = models.BooleanField(null=False, default=False)  # Indica si el logro es visible para los usuarios o no
+    progreso_oculto = models.BooleanField(null=False, default=False)  # Indica si el progreso del logro es visible para los usuarios o no
 
 class RequisitoLogro(models.Model):
     class Requisito(models.TextChoices):
