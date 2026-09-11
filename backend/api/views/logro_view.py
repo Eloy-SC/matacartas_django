@@ -23,7 +23,7 @@ def _parse_bool_param(value):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def listar_logros(request):
+def listar_logros_admin(request):
     page_param = request.query_params.get("page", "1")
     try:
         page = max(1, int(page_param))
@@ -47,6 +47,7 @@ def listar_logros(request):
             oculto=oculto,
             order_by=order_by,
             order_dir=order_dir,
+            admin=True,
         )
     except PermissionError as e:
         return Response({"detail": str(e)}, status=403)
@@ -131,3 +132,23 @@ def crear_logro(request):
     }
 
     return Response(data, status=status.HTTP_201_CREATED)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def obtener_requisitos_logro(request, logro_id):
+    try:
+        requisitos = logro_service.obtener_requisitos_logro(request.user, logro_id)
+    except ValueError as e:
+        return Response({"detail": str(e)}, status=404)
+
+    data = [
+        {
+            "id": requisito["id"],
+            "requisito": requisito["requisito"],
+            "una_partida": requisito["una_partida"],
+            "valor_necesario": requisito["valor_necesario"],
+        }
+        for requisito in requisitos
+    ]
+
+    return Response(data, status=status.HTTP_200_OK)

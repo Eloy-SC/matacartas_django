@@ -56,7 +56,10 @@ def listar_logros_paginated(
     oculto=None,
     order_by="nombre",
     order_dir="asc",
+    admin=False,
 ):
+    if admin and not actor.is_staff:
+        raise PermissionError("No tienes permiso para listar logros")
     if not actor.is_active:
         raise PermissionError("No tienes permiso para listar logros")
 
@@ -95,3 +98,15 @@ def eliminar_logro_admin(actor, logro_id):
 
     logro.delete()
 
+def obtener_requisitos_logro(actor, logro_id):
+    if not actor.is_staff:
+        raise PermissionError("No tienes permiso para obtener los requisitos de un logro")
+
+    logro = Logro.objects.filter(id=logro_id).first()
+    if logro is None:
+        raise ValueError("No se encontró el logro")
+
+    requisitos = RequisitoLogro.objects.filter(logro=logro).values(
+        "id", "requisito", "una_partida", "valor_necesario"
+    )
+    return list(requisitos)
