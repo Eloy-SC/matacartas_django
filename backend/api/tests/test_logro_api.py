@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from api.models.recompensa import Logro, RequisitoLogro
+from api.models.recompensa import Logro, RecompensaUsuario, RequisitoLogro
 
 
 class LogroAPITest(APITestCase):
@@ -67,3 +67,49 @@ class LogroAPITest(APITestCase):
         self.assertEqual(response.data["total"], 11)
         self.assertEqual(response.data["total_pages"], 2)
         self.assertEqual(len(response.data["items"]), 1)
+
+    def test_listar_logros_includes_visible_and_unlocked_hidden_only(self):
+        visible = Logro.objects.create(
+            nombre="Logro Visible",
+            descripcion="Visible",
+            oculto=False,
+        )
+        hidden_unlocked = Logro.objects.create(
+            nombre="Logro Oculto Desbloqueado",
+            descripcion="Oculto pero conseguido",
+            oculto=True,
+        )
+        Logro.objects.create(
+            nombre="Logro Oculto Pendiente",
+            descripcion="Oculto y pendiente",
+            oculto=True,
+        )
+        RecompensaUsuario.objects.create(usuario=self.user, logro=hidden_unlocked)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(reverse("listar-logros"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        items = {item["nombre"]: item for item in response.data["items"]}
+        self.assertIn(visible.nombre, items)
+        self.assertTrue(items[hidden_unlocked.nombre]["desbloqueado"])
+        self.assertNotIn("Logro Oculto Pendiente", items)
+
+    def test_contar_logros_ocultos_pendientes(self):
+        hidden_unlocked = Logro.objects.create(
+            nombre="Oculto Conseguido",
+            descripcion="Conseguido",
+            oculto=True,
+        )
+        Logro.objects.create(
+            nombre="Oculto Pendiente",
+            descripcion="Pendiente",
+            oculto=True,
+        )
+        RecompensaUsuario.objects.create(usuario=self.user, logro=hidden_unlocked)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(reverse("contar-logros-ocultos-pendientes"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total"], 1)

@@ -152,3 +152,60 @@ def obtener_requisitos_logro(request, logro_id):
     ]
 
     return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def listar_logros_usuario(request):
+    page_param = request.query_params.get("page", "1")
+    try:
+        page = max(1, int(page_param))
+    except (TypeError, ValueError):
+        page = 1
+
+    ordering_param = (request.query_params.get("ordering") or "nombre").strip()
+    order_dir = "desc" if ordering_param.startswith("-") else "asc"
+    order_by = ordering_param.lstrip("-") or "nombre"
+
+    try:
+        paged = logro_service.listar_logros_usuario_paginated(
+            request.user,
+            page=page,
+            page_size=10,
+            order_by=order_by,
+            order_dir=order_dir,
+        )
+    except PermissionError as e:
+        return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+    data = [
+        {
+            "id": logro.id,
+            "nombre": logro.nombre,
+            "descripcion": logro.descripcion,
+            "imagen": logro.imagen,
+            "oculto": logro.oculto,
+            "desbloqueado": logro.desbloqueado,
+            "requisitos": [
+                {
+                    "id": requisito.id,
+                    "requisito": requisito.requisito,
+                    "una_partida": requisito.una_partida,
+                    "valor_necesario": requisito.valor_necesario,
+                }
+                for requisito in logro.requisitologro_set.all()
+            ],
+        }
+        for logro in paged["items"]
+    ]
+    return Response({**paged, "items": data}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def contar_logros_ocultos_pendientes(request):
+    try:
+        total = logro_service.contar_logros_ocultos_pendientes(request.user)
+    except PermissionError as e:
+        return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+    return Response({"total": total}, status=status.HTTP_200_OK)

@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from api.models.recompensa import Medalla
+from api.models.recompensa import Medalla, RecompensaUsuario
 
 
 class MedallaAPITest(APITestCase):
@@ -44,6 +44,22 @@ class MedallaAPITest(APITestCase):
         self.assertEqual(response.data["page"], 1)
         self.assertEqual(response.data["page_size"], 10)
         self.assertEqual(response.data["total"], 1)
+
+    def test_listar_medallas_usuario_returns_only_own_medallas(self):
+        own_medalla = self.medalla
+        other_medalla = Medalla.objects.create(
+            nombre="Medalla de otro usuario",
+            categoria=Medalla.CategoriaMedalla.ORO,
+        )
+        RecompensaUsuario.objects.create(usuario=self.user, medalla=own_medalla)
+        RecompensaUsuario.objects.create(usuario=self.admin, medalla=other_medalla)
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(reverse("listar-medallas-usuario"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["total"], 1)
+        self.assertEqual(response.data["items"][0]["nombre"], own_medalla.nombre)
 
     def test_listar_medallas_filters_orders_and_paginates(self):
         Medalla.objects.bulk_create([

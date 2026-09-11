@@ -1,6 +1,6 @@
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 
-from ..models.recompensa import Logro
+from ..models.recompensa import Logro, RecompensaUsuario
 
 
 def _build_logros_queryset(search=None, nombre=None, oculto=None):
@@ -36,3 +36,34 @@ def get_logros_count(*, search=None, nombre=None, oculto=None):
 
 def get_logros():
 	return Logro.objects.all()
+
+
+def _build_logros_usuario_queryset(usuario_id):
+	recompensa_usuario = RecompensaUsuario.objects.filter(
+		usuario_id=usuario_id,
+		logro_id=OuterRef("pk"),
+	)
+	return Logro.objects.prefetch_related("requisitologro_set").annotate(
+		desbloqueado=Exists(recompensa_usuario),
+	).filter(
+		Q(oculto=False) | Q(desbloqueado=True),
+	)
+
+
+def list_logros_usuario_paginated(usuario_id, offset, limit, *, ordering=None):
+	ordering = ordering or "nombre"
+	queryset = _build_logros_usuario_queryset(usuario_id)
+	order_fields = [ordering]
+	if ordering.lstrip("-") != "id":
+		order_fields.append("id")
+	return queryset.order_by(*order_fields)[offset:offset + limit]
+
+
+def get_logros_usuario_count(usuario_id):
+	return _build_logros_usuario_queryset(usuario_id).count()
+
+
+def get_logros_ocultos_pendientes_count(usuario_id):
+	return Logro.objects.filter(oculto=True).exclude(
+		recompensausuario__usuario_id=usuario_id,
+	).count()

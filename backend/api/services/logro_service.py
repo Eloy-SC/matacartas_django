@@ -9,7 +9,14 @@ from ..selectors.mano_selector import get_manos_de_partida
 from ..selectors.partida_selector import get_partida_usuario_by_partida_and_color
 
 from ..models.recompensa import Logro, RecompensaUsuario, RequisitoLogro, RequisitoLogroUsuario
-from ..selectors.logro_selector import get_logros, get_logros_count, list_logros_paginated
+from ..selectors.logro_selector import (
+    get_logros,
+    get_logros_count,
+    get_logros_ocultos_pendientes_count,
+    get_logros_usuario_count,
+    list_logros_paginated,
+    list_logros_usuario_paginated,
+)
 from ..utils.exceptions import RegistrationError
 
 
@@ -104,6 +111,31 @@ def eliminar_logro_admin(actor, logro_id):
 
     logro.delete()
 
+
+def listar_logros_usuario_paginated(actor, *, page, page_size, order_by="nombre", order_dir="asc"):
+    if not actor.is_active:
+        raise PermissionError("No tienes permiso para listar logros")
+
+    allowed_order_fields = {"id", "nombre", "oculto"}
+    order_field = order_by if order_by in allowed_order_fields else "nombre"
+    ordering = f"{'-' if order_dir == 'desc' else ''}{order_field}"
+    total = get_logros_usuario_count(actor.id)
+    offset = (page - 1) * page_size
+    items = list(list_logros_usuario_paginated(actor.id, offset, page_size, ordering=ordering))
+    return {
+        "items": items,
+        "page": page,
+        "page_size": page_size,
+        "total": total,
+        "total_pages": max(1, (total + page_size - 1) // page_size),
+    }
+
+
+def contar_logros_ocultos_pendientes(actor):
+    if not actor.is_active:
+        raise PermissionError("No tienes permiso para consultar logros")
+    return get_logros_ocultos_pendientes_count(actor.id)
+
 def obtener_requisitos_logro(actor, logro_id):
     if not actor.is_staff:
         raise PermissionError("No tienes permiso para obtener los requisitos de un logro")
@@ -133,13 +165,17 @@ def asignar_logros_a_usuario(partida_usuario):
                     usuario=usuario, requisito_logro=req
                 ).first()
                 if reqlogusuario:
-                    progreso += reqlogusuario.progreso
+                    reqlogusuario.progreso += progreso
                     reqlogusuario.save(update_fields=["progreso"])
                 else:
                     reqlogusuario = RequisitoLogroUsuario(usuario=usuario, requisito_logro=req, progreso=progreso)
                     reqlogusuario.save()
-            if progreso >= req.valor_necesario:
-                cumplidos += 1
+                # Una vez guardado el progreso, se comprueba si se ha cumplido el requisito
+                if reqlogusuario.progreso >= req.valor_necesario:
+                    cumplidos += 1
+            else:
+                if progreso >= req.valor_necesario:
+                    cumplidos += 1
         if cumplidos == requisitos.count():
             recompensa_usuario = RecompensaUsuario(
                 usuario=usuario,

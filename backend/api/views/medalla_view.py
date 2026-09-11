@@ -82,6 +82,33 @@ def get_medalla(request, medalla_id):
     return Response(data, status=200)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def listar_medallas_usuario(request):
+    page_param = request.query_params.get("page", "1")
+    try:
+        page = max(1, int(page_param))
+    except (TypeError, ValueError):
+        page = 1
+
+    ordering_param = (request.query_params.get("ordering") or "nombre").strip()
+    order_dir = "desc" if ordering_param.startswith("-") else "asc"
+    order_by = ordering_param.lstrip("-") or "nombre"
+
+    try:
+        paged = medalla_service.listar_medallas_usuario_paginated(
+            request.user,
+            page=page,
+            page_size=10,
+            order_by=order_by,
+            order_dir=order_dir,
+        )
+    except PermissionError as e:
+        return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+    return Response(paged, status=status.HTTP_200_OK)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def crear_medalla_admin(request):
