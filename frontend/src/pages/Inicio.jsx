@@ -144,6 +144,14 @@ export default function Inicio() {
 			<img src={cabecera} alt="Matacartas" style={{maxWidth: "100%", height: "auto"}} />
 			<button
 				type="button"
+				className="rec-inicio-button"
+				onClick={() => navigate("/recompensas")}
+				aria-label="Ver recompensas"
+			>
+				🎁
+			</button>
+			<button
+				type="button"
 				className="estad-inicio-button"
 				onClick={() => navigate("/estadisticas")}
 				aria-label="Ver estadísticas"

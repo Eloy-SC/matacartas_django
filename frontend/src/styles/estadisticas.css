@@ -173,6 +173,136 @@
   color: var(--ui-accent);
 }
 
+.recompensas-page {
+  gap: 20px;
+}
+
+.recompensas-panel {
+  margin: 0 auto;
+}
+
+.recompensas-panel h2,
+.recompensas-heading h2 {
+  margin: 0;
+  color: #000000;
+  text-align: center;
+}
+
+.recompensas-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.recompensas-heading span {
+  color: #3c3c3c;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.recompensas-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.recompensa-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 92px;
+  padding: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.recompensa-image {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.recompensa-image--empty {
+  display: grid;
+  place-items: center;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  color: #777777;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.recompensa-item__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.recompensa-item h3 {
+  margin: 0 0 6px;
+  color: #000000;
+  overflow-wrap: anywhere;
+}
+
+.recompensa-item__content > span {
+  color: var(--ui-accent);
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.logro-item__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logro-item__title h3 {
+  margin-bottom: 0;
+}
+
+.logro-item p {
+  margin-top: 8px;
+  color: #3c3c3c;
+  overflow-wrap: anywhere;
+}
+
+.logro-item--unlocked {
+  border-color: #78ad7b;
+  background: #dff1df;
+}
+
+.logro-status {
+  flex: 0 0 auto;
+  font-size: 1.8rem;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.logro-status--unlocked {
+  color: #218838;
+}
+
+.logro-status--locked {
+  color: #c62828;
+}
+
+.recompensas-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+  color: #3c3c3c;
+  font-weight: bold;
+}
+
+.recompensas-pagination .estadisticas-history-button {
+  margin: 0;
+}
+
 .estadisticas-historial-list {
   display: grid;
   gap: 14px;
@@ -256,5 +386,20 @@
 
   .estadisticas-historial-card__header {
     display: grid;
+  }
+
+  .recompensa-item {
+    align-items: flex-start;
+  }
+
+  .recompensa-image {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+
+  .recompensas-pagination {
+    gap: 8px;
+    font-size: 0.85rem;
   }
 }
