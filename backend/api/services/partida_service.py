@@ -2,6 +2,8 @@ import random
 from sqlite3 import IntegrityError
 from django.utils import timezone
 
+from backend.api.services.logro_service import asignar_logros_a_usuario
+
 from ..selectors.torneo_selector import get_partida_torneo_by_partida_id
 
 from ..selectors.ronda_selector import get_rondas_de_mano
@@ -716,6 +718,14 @@ def finalizar_partida(actor, partida_id):
     partida_torneo = get_partida_torneo_by_partida_id(partida_id)
     if partida_torneo:
         aux_almacenar_posiciones_finales_partida_torneo(partida_id)
+
+    # Asignar logros
+    for pos, jugadores_pos in posiciones.items():
+        for jugador in jugadores_pos:
+            color = jugador["color"] if isinstance(jugador, dict) else jugador.color
+            partida_usuario = get_partida_usuario_by_partida_and_color(partida_id, color)
+            if partida_usuario:
+                asignar_logros_a_usuario(partida_usuario)
 
     return res
 

@@ -33,3 +33,6 @@ def list_logros_paginated(offset, limit, *, search=None, nombre=None, oculto=Non
 
 def get_logros_count(*, search=None, nombre=None, oculto=None):
 	return _build_logros_queryset(search=search, nombre=nombre, oculto=oculto).count()
+
+def get_logros():
+	return Logro.objects.all()

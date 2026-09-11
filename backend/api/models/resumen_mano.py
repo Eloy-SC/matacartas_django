@@ -3,7 +3,7 @@ from django.db import models
 class ResumenMano(models.Model):
 
     mano = models.ForeignKey("Mano", on_delete=models.CASCADE)
-    tickets_usados = models.JSONField(default=dict) # Tickets usados durante la mano: clave num de la ronda y valor una lista de tickets usados
+    tickets_usados = models.JSONField(default=dict) # Tickets usados durante la mano: clave num de la ronda y valor una lista de (color, ticket)
     victorias = models.JSONField(default=dict) # Claves rondas y valores tuplas (jugador, tipo_victoria)
     muertes = models.JSONField(default=dict) # Claves rondas y valores (jugador_matador, jugador_matado)
     retiradas = models.JSONField(default=dict) # Claves rondas y valores [jugador_retirado1, jugador_retirado2...]

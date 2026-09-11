@@ -56,6 +56,17 @@ class RequisitoLogro(models.Model):
     una_partida = models.BooleanField(default=False) # Indica si el requisito se debe cumplir en una sola partida o de forma acumulativa. No es compatible con algunos tipos de requisito
     valor_necesario = models.IntegerField(default=1) # Valor necesario para cumplir el requisito y obtener el logro
 
+class RequisitoLogroUsuario(models.Model):
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE
+    )
+    requisito_logro = models.ForeignKey(
+        RequisitoLogro,
+        on_delete=models.CASCADE
+    )
+    progreso = models.IntegerField(default=0)
+
 class RecompensaUsuario(models.Model):
     usuario = models.ForeignKey(
         Usuario,

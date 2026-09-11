@@ -696,5 +696,34 @@ class Migration(migrations.Migration):
                 ("valor_necesario", models.IntegerField(default=1)),
             ],
         ),
+        migrations.CreateModel(
+            name="RequisitoLogroUsuario",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.usuario",
+                    ),
+                ),
+                (
+                    "requisito_logro",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.requisitologro",
+                    ),
+                ),
+                ("progreso", models.IntegerField(default=0)),
+            ],
+        ),
         migrations.RunPython(seed_config_global, reverse_code=migrations.RunPython.noop),
     ]
